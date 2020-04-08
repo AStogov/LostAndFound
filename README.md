@@ -192,7 +192,7 @@ python manage.py createsuperuser
 
 
 
-## <a name = "user">user相关接口</a>
+## <a name = "user">user相关接口文档</a>
 
 * [x] <a href='#login'>login</a>   
 * [x] <a href='#getOpenid'>getOpenid</a>   
@@ -201,26 +201,24 @@ python manage.py createsuperuser
 * [x] <a href='#get'>get</a>   
 * [x] <a href='#update'>update</a>    
 
-
-## 接口文档   
-
 用户交互流程  
 
 **注：用户的openid是所有操作的必须项**
 
-用户数据：
+### 数据模型
 
-| 变量名    | 类型   | 变量含义                            |
-| --------- | ------ | :---------------------------------- |
-| openid    | string | 前端获取的用户唯一标识              |
-| nick_name | string | 用户昵称                            |
-| avatar    | string | 用户头像(url)，一般是微信头像       |
-| gender    | int    | 性别，0或1                          |
-| phone     | string | 用户联系方式（不一定一定是手机号）  |
-| ctime     | string | 数据创建时间（所有model共有的特性） |
-| mtime     | string | 数据修改时间（所有model共有的特性） |
+| 变量名    | 类型   | 变量含义                             |
+| --------- | ------ | :----------------------------------- |
+| id        | int    | 数据模型内部自增索引。前端无需操作。 |
+| openid    | string | 前端获取的用户唯一标识               |
+| nick_name | string | 用户昵称                             |
+| avatar    | string | 用户头像(url)，一般是微信头像        |
+| gender    | int    | 性别，0或1                           |
+| phone     | string | 用户联系方式（不一定一定是手机号）   |
+| ctime     | string | 数据创建时间（所有model共有的特性）  |
+| mtime     | string | 数据修改时间（所有model共有的特性）  |
 
-## Token鉴权
+### Token鉴权
 
 [Token账户鉴权系统][https://gogs.itoken.team/634308664/token-sso/src/master]
 
@@ -258,7 +256,6 @@ params:
 | phone     | string |  是  |            手机号，必要时可以短信验证             |
 | avatar    | string |  是  |                头像url（微信头像）                |
 | nick_name | string |  是  |            用户微信名或用来显示的名字             |
-|           |        |      |                                                   |
 
 return:
 
@@ -267,6 +264,7 @@ return:
     "code": 0,
     "msg": "success",
     "data": {
+        "id": 1,
         "openid": "xxxxxxxx",
         "ctime": "2020-03-26 11:34:29",
         "mtime": "2020-03-26 11:34:35",
@@ -317,6 +315,7 @@ return:
     "code": 0,
     "msg": "success",
     "data": {
+        "id": 1,
         "openid": "xxxxxxxxxxxxxx",
         "ctime": "2020-03-26 11:34:29",
         "mtime": "2020-03-26 11:34:35",
@@ -408,22 +407,19 @@ return:
 | -3   | update参数提交的不是有效的json格式 |
 | -4   |            json处理错误            |
 
+
+
+
+
   ## <a name = "item">item相关接口</a>
 
-* [x] <a href='#categories'>0categories</a>   
 * [x] <a href='#create'>create</a>   
 * [x] <a href='#list'>list</a>   
 * [x] <a href='#delete'>delete</a>   
 * [x] <a href='#update'>update</a>   
-* [x] <a href='#apply'>apply</a>   
-* [x] <a href='#confirm'>confirm</a>    
-* [x] <a href='#reject'>reject</a>    
-* [x] <a href='#ocrPrintedText'>ocrPrintedText</a>    
-* [x] <a href='#search'>search</a>    
+* [x] <a href='#recover'>recover</a>   
 
-## 接口文档      
-
-请注意！：用户在服务端的唯一标识为openid   
+请注意！：物品在服务端的唯一标识为id。删除、恢复和更新都需要提供id来进行操作。
 
 错误返回值和含义：
 
@@ -432,7 +428,20 @@ return:
 | -1   | 提供的参数非法         |
 | -2   | 其他错误，详见具体输出 |
 
+### 数据模型
 
+| 变量名    | 类型        | 变量含义                                 |
+| --------- | ----------- | :--------------------------------------- |
+| id        | int         | 模型内自动生成的自增索引，物品的唯一标识 |
+| openid    | string      | 发布者的openid                           |
+| type      | int         | 物品属性（1是丢失的，2是找到的）         |
+| title     | string      | 用户头像(url)，一般是微信头像            |
+| desc      | string      | 物品描述                                 |
+| images    | json_string | 物品图片                                 |
+| visible   | int         | 是否可见。（用来完成删除和重新发布操作） |
+| ctime     | string      | 数据创建时间（所有model共有的特性）      |
+| mtime     | string      | 数据修改时间（所有model共有的特性）      |
+| user_info | json        | 发布者的个人用户信息                     |
 
 ### <a name='create'>create</a> 创建动态   
 
@@ -449,13 +458,33 @@ params:
 | title  |      string |  否  |                物品名称（保留字段，可只传""）                |
 | images | json_string |  否  | 建议先调用接口上传图片(upload/itemImg)，成功填此接口；或者先创建，再上传图片，再更新此字段（不建议） |
 
+**返回该物品的信息。物品信息格式化输出时中包含了发布者的信息**
+
 return:
 
 ```json
 {
     "code": 0,
     "msg": "success",
-    "data": []
+    "data": [{
+                "id": 1,
+                "openid": "1321321231",
+                "ctime": "2020-03-26 14:55:20",
+                "mtime": "2020-03-26 14:55:28",
+                "type": 1,
+                "title": "",
+                "desc": "丢失",
+                "images": [],
+                "user_info": {
+                    "openid": "xxxxxxxx",
+        			"ctime": "2020-03-26 11:34:29",
+        			"mtime": "2020-03-26 11:34:35",
+        			"nick_name": "张三",
+        			"avatar": "http://www.example/media/avatar/1_20200401184953.jpg",
+			        "gender": "1",
+        			"phone": "12312312312"
+                }
+            }]
 }
 ```
 
@@ -470,15 +499,18 @@ params:
 添加page和size的原因是控制一次呈现的物品数量，一面一次性返回过多数据。前端可以用“下一页”之类功能来使size+1来达到翻页效果
 
 
-| 名称   |   类型 | 必须 |                             备注                             |
-| :----- | -----: | :--: | :----------------------------------------------------------: |
-| id     |    int |  否  |                        以物品id来查询                        |
-| openid |    int |  否  |         以openid来查询（用来查看用户发布的所有消息）         |
-| type   |    int |  否  |                 以类型来查询，1丢失的2找到的                 |
-| desc   | string |  否  |                           物品描述                           |
-| page   |    int |  否  | 显示第几页，如果无参数则默认显示第0页（防止一下载入太多数据） |
-| size   |    int |  否  |              每页几个物品，如果无参数则默认10个              |
-| title  | string |  否  |                物品名称（保留字段，可只传""）                |
+| 名称    |   类型 | 必须 |                             备注                             |
+| :------ | -----: | :--: | :----------------------------------------------------------: |
+| id      |    int |  否  |                        以物品id来查询                        |
+| openid  |    int |  否  |         以openid来查询（用来查看用户发布的所有消息）         |
+| type    |    int |  否  |                 以类型来查询，1丢失的2找到的                 |
+| desc    | string |  否  |                           物品描述                           |
+| page    |    int |  否  | 显示第几页，如果无参数则默认显示第0页（防止一下载入太多数据） |
+| size    |    int |  否  |              每页几个物品，如果无参数则默认10个              |
+| title   | string |  否  |                物品名称（保留字段，可只传""）                |
+| visible |    int |  否  | 显示可见的或已隐藏的动态。默认值为1，即只显示可见的（未被delete操作的）动态。传0时可用来显示用户删除的动态。 |
+
+**列表返回的物品都是以id降序排序的，也就是指按发布时间降序排序，越新越靠前**
 
 return:
 
@@ -535,7 +567,7 @@ return:
 
 ### <a name='delete'>delete</a> 删除动态   
 
-url = {domain}/service/item/delete   
+url = www.example.com/service/item/delete
 method = post   
 params:   
 
@@ -558,7 +590,7 @@ return:
 
 ### <a name='apply'>update</a> 更新动态   
 
-url = {domain}/service/item/update   
+url = www.example.com/service/item/update   
 method = post   
 params:   
 
@@ -582,18 +614,41 @@ return:
 }
 ```
 
+### <a name='recover'>recover</a> 恢复动态   
 
+**用于重新发布**
+
+url = www.example.com/service/item/recover  
+method = post   
+params:   
+
+
+| 名称   | 类型 | 必须 |                  备注                  |
+| :----- | ---: | :--: | :------------------------------------: |
+| id     |  int |  是  |                 动态id                 |
+| openid |  int |  是  | 用户openid，用户只能恢复自己发布的信息 |
+
+return:
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": []
+}
+```
+
+
+### 
 
 ## <a name = "upload">upload相关接口</a>
 
 * [x] <a href='#avatar'>avatar</a>   
 * [x] <a href='#itemImg'>itemImg</a>  
 
-## 接口文档   
 
-#### 逻辑：
 
-*如果用户是第一次注册，就先调用avatar方法保存用户头像，并将返回值保存后留等调用login方法时提交，以此来将用户的头像保存在本地加快内容加载速度。*
+***如果用户是第一次注册，就先调用avatar方法保存用户头像，并将返回值保存后留等调用login方法时提交，以此来将用户的头像保存在本地加快内容加载速度。***
 
 ### <a name='avatar'>avatar</a> 上传用户头像
 
@@ -655,4 +710,3 @@ return:
 | ---- | :--------------------------: |
 | -1   | 提交的参数非法或文件不是图片 |
 | -2   |   其他错误，详情见错误输出   |
-

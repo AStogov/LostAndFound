@@ -43,6 +43,6 @@ class Item(BaseModel):
     def format(self, if_time_format=True, time_format=''):
         dic = super().format(if_time_format, time_format)
         dic['images'] = json.loads(dic['images'])
-        user_res = client.rpc('user/get', {'id': dic['openid']})
+        user_res = client.rpc('user/get', {'openid': dic['openid']})
         dic['user_info'] = user_res['data']
         return dic
