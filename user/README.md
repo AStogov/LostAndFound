@@ -17,10 +17,10 @@
 | --------- | ------ | :----------------------------------- |
 | id        | int    | 数据模型内部自增索引。前端无需操作。 |
 | openid    | string | 前端获取的用户唯一标识               |
-| nick_name | string | 用户昵称                             |
-| avatar    | string | 用户头像(url)，一般是微信头像        |
-| gender    | int    | 性别，0或1                           |
-| phone     | string | 用户联系方式（不一定一定是手机号）   |
+| name | string | 用户姓名                             |
+| phone     | string | 用户手机号   |
+| card | string | 用户的校园卡号 |
+| contact | string | 用户的其他联系方式，如QQ/微信等（可不填） |
 | ctime     | string | 数据创建时间（所有model共有的特性）  |
 | mtime     | string | 数据修改时间（所有model共有的特性）  |
 
@@ -30,7 +30,7 @@
 
 请前端同学先调用token账户鉴权系统，鉴权成功后再以流程验证登录。
 
-如果鉴权成功，鉴权时用户输入的手机号可以直接作为login的phone参数进行注册，不需要再验证。
+**鉴权成功后，鉴权返回的手机号、姓名、校园卡号可以直接作为login的参数进行注册。**
 
 
 ```mermaid
@@ -58,10 +58,10 @@ params:
 | 名称      |  类型  | 必须 |                       备注                        |
 | --------- | :----: | :--: | :-----------------------------------------------: |
 | openid    | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
-| gender    |  int   |  是  |           1是男还是女由前端自己决定= =            |
-| phone     | string |  是  |            手机号，必要时可以短信验证             |
-| avatar    | string |  是  |                头像url（微信头像）                |
-| nick_name | string |  是  |            用户微信名或用来显示的名字             |
+| phone     | string |  是  |            手机号             |
+| name | string |  是  |            用户姓名             |
+| card | string | 是 | 用户的校园卡号 |
+| contact | string | 否 | （可选）用户的其他联系方式，如QQ/微信等 |
 
 return:
 
@@ -72,12 +72,12 @@ return:
     "data": {
         "id": 1,
         "openid": "xxxxxxxx",
+        "phone": "12345678912",
+        "name": "张三",
+        "card": "222222",
+        "contact": "weixin_id123",
         "ctime": "2020-03-26 11:34:29",
         "mtime": "2020-03-26 11:34:35",
-        "nick_name": "张三",
-        "avatar": "http://www.example/media/avatar/1_20200401184953.jpg",
-        "gender": "1",
-        "phone": "12312312312"
     }
 }
 ```
@@ -122,13 +122,13 @@ return:
     "msg": "success",
     "data": {
         "id": 1,
-        "openid": "xxxxxxxxxxxxxx",
+        "openid": "xxxxxxxx",
+        "phone": "12345678912",
+        "name": "张三",
+        "card": "222222",
+        "contact": "weixin_id123",
         "ctime": "2020-03-26 11:34:29",
         "mtime": "2020-03-26 11:34:35",
-        "nick_name": "张三",
-        "avatar": "http://www.example.com/media/avatar/1_20200320184953.jpg",
-        "gender": 1,
-        "phone": "12312312312"
     }
 }
 ```
@@ -158,13 +158,14 @@ return:
     "code": 0,
     "msg": "success",
     "data": {
-        "openid": "xxxxxxxxxxxxxx",
+        "id": 1,
+        "openid": "xxxxxxxx",
+        "phone": "12345678912",
+        "name": "张三",
+        "card": "222222",
+        "contact": "weixin_id123",
         "ctime": "2020-03-26 11:34:29",
         "mtime": "2020-03-26 11:34:35",
-        "nick_name": "张三",
-        "avatar": "https://www.example.com/media/avatar/1_20200320184953.jpg",
-        "gender": 1,
-        "phone": "12312312312"
     }
 }
 ```

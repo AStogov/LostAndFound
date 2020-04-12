@@ -4,7 +4,7 @@
 * [x] <a href='#list'>list</a>   
 * [x] <a href='#delete'>delete</a>   
 * [x] <a href='#update'>update</a>   
-* [x] [recover][#recover]     
+* [x] <a href='#recover'>recover</a>   
 
 请注意！：物品在服务端的唯一标识为id。删除、恢复和更新都需要提供id来进行操作。
 
@@ -63,13 +63,14 @@ return:
                 "desc": "丢失",
                 "images": [],
                 "user_info": {
-                    "openid": "xxxxxxxx",
+                    "id": 1,
+        			"openid": "xxxxxxxx",
+        			"phone": "12345678912",
+        			"name": "张三",
+        			"card": "222222",
+        			"contact": "weixin_id123",
         			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35",
-        			"nick_name": "张三",
-        			"avatar": "http://www.example/media/avatar/1_20200401184953.jpg",
-			        "gender": "1",
-        			"phone": "12312312312"
+        			"mtime": "2020-03-26 11:34:35"
                 }
             }]
 }
@@ -118,13 +119,14 @@ return:
                 "desc": "丢失",
                 "images": [],
                 "user_info": {
-                    "openid": "xxxxxxxx",
+                    "id": 1,
+        			"openid": "xxxxxxxx",
+        			"phone": "12345678912",
+            		"name": "张三",
+        			"card": "222222",
+        			"contact": "weixin_id123",
         			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35",
-        			"nick_name": "张三",
-        			"avatar": "http://www.example/media/avatar/1_20200401184953.jpg",
-			        "gender": "1",
-        			"phone": "12312312312"
+        			"mtime": "2020-03-26 11:34:35"
                 }
             },
             {
@@ -137,13 +139,14 @@ return:
                 "desc": "丢失",
                 "images": [],
                 "user_info": {
-                    "openid": "xxxxxxxx",
+                    "id": 1,
+        			"openid": "xxxxxxxx",
+        			"phone": "12345678912",
+            		"name": "张三",
+        			"card": "222222",
+        			"contact": "weixin_id123",
         			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35",
-        			"nick_name": "张三",
-        			"avatar": "http://www.example/media/avatar/1_20200401184953.jpg",
-			        "gender": "1",
-        			"phone": "12312312312"
+        			"mtime": "2020-03-26 11:34:35"
                 }
             }
         ]
@@ -224,6 +227,3 @@ return:
     "data": []
 }
 ```
-
-
-### 

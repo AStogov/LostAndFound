@@ -6,5 +6,5 @@ from user.models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('openid', 'nick_name', 'avatar', 'gender', 'phone', 'ctime', 'mtime')
-    search_fields = ('openid', 'nick_name',  'phone')
+    list_display = ('openid', 'name', 'card', 'phone', 'contact', 'ctime', 'mtime')
+    search_fields = ('openid', 'name',  'phone', 'card')

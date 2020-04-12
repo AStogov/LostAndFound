@@ -56,10 +56,9 @@ def login(request):
     required = {
         'openid': {'required': True},
         'phone': {'required': True},
-        'avatar': {'required': True},
-        'gender': {'required': True},
-        'nick_name': {'required': True},
-        'password': {'required': True}
+        'card': {'required': True},
+        'name': {'required': True},
+        'contact': {'required': False}
     }
     params = request.POST.dict()
     check(required, params)
@@ -67,21 +66,14 @@ def login(request):
         openid = request.POST['openid']
         dic = request.POST.dict().copy()
         update_data = {
-            'nick_name': dic['nick_name'],
-            'gender': dic['gender'],
+            'name': dic['name'],
             'phone': dic['phone'],
-            'avatar': dic['avatar']
+            'card': dic['card']
         }
+        if 'contact' in dic:
+            update_data['contact'] = dic['contact']
         # 如果不存在此用户，以openid创建这个用户
         user, created = User.objects.update_or_create(openid=openid, defaults=update_data)
-        # 将头像存在本地
-        rpc_res = rpc(fc='upload/avatar', data={'avatar': user.avatar, 'openid': user.openid})
-        if rpc_res['code'] is not None:
-            if rpc_res['code'] == 0:
-                user.avatar = rpc_res['data']['avatar']
-                user.save()
-            else:
-                log('ERROR', 'user login', 'failed to save avatar', data=[user.avatar, params])
         res['data'] = user.format()
 
     except Exception as e:
