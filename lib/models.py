@@ -5,8 +5,8 @@ from django.utils import timezone
 
 
 class BaseModel(models.Model):
-    ctime = models.DateTimeField(verbose_name="创建时间", default=timezone.now, blank=True)
-    mtime = models.DateTimeField(verbose_name="修改时间", auto_now=True, blank=True)
+    created_at = models.DateTimeField(verbose_name="创建时间", default=timezone.now, blank=True)
+    modified_at = models.DateTimeField(verbose_name="修改时间", auto_now=True, blank=True)
 
     class Meta:
         abstract = True

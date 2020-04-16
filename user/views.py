@@ -56,9 +56,9 @@ def login(request):
     required = {
         'openid': {'required': True},
         'phone': {'required': True},
-        'card': {'required': True},
+        'cardno': {'required': True},
         'name': {'required': True},
-        'contact': {'required': False}
+        'wxid': {'required': False}
     }
     params = request.POST.dict()
     check(required, params)
@@ -68,10 +68,10 @@ def login(request):
         update_data = {
             'name': dic['name'],
             'phone': dic['phone'],
-            'card': dic['card']
+            'cardno': dic['cardno']
         }
-        if 'contact' in dic:
-            update_data['contact'] = dic['contact']
+        if 'wxid' in dic:
+            update_data['wxid'] = dic['wxid']
         # 如果不存在此用户，以openid创建这个用户
         user, created = User.objects.update_or_create(openid=openid, defaults=update_data)
         res['data'] = user.format()

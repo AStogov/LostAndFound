@@ -19,6 +19,38 @@ from lib.client import rpc
 from lib.utils import log
 from lib.view import check
 
+"""
+
+openid = models.IntegerField(null=False, blank=False)
+status = models.IntegerField(default=1)  # 1:found 2:lost
+type = models.CharField(max_length=255, blank=True)
+goods = models.CharField(max_length=255, blank=True)
+area = models.IntegerField(default=0)
+address = models.CharField(max_length=255, blank=True)
+descr = models.TextField(default='', blank=True)  # description
+img = models.TextField(default=json.dumps([]))  # u can upload more than one pic
+time = models.CharField(max_length=255, blank=True)
+visible = models.IntegerField(default=1)  # 1:visible 0:invisible
+
+
+id: 物品id
+openid: 发布者的openid 用来获取发布者信息
+goods: 物品的名称
+type: 物品类型(char)
+area: 校区(int)
+自行定义校区对应序号，例如：
+0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升
+address: 具体地点
+descr: 描述
+created_at: 发布时间
+modified_at: 修改时间
+status: 物品的属性：1.寻找失主 2.寻找此物品
+time: 丢失或捡到的时间
+img: 图片(list) 物品的图片信息
+
+
+"""
+
 
 @csrf_exempt
 def create(request):
@@ -26,21 +58,23 @@ def create(request):
     params = request.POST.dict()
     required = {
         'openid': {'required': True},
-        'type': {'required': True},
-        'title': {'required': False},
-        'desc': {'required': True},
-        'images': {'required': False},
-        'ctime': {'required': False},
+        'status': {'required': True},
+        'type': {'required': False},
+        'address': {'required': False},
+        'area': {'required': False},
+        'goods': {'required': False},
+        'descr': {'required': False},
+        'time': {'required': False},
+        'img': {'required': False},
+        'visible': {'required', False}
     }
     check_res = check(required, params)
     if check_res is None or check_res['code'] != 0:
         return JsonResponse(check_res)
 
     try:
-        if 'ctime' in params:
-            params['ctime'] = datetime.datetime.strptime(params['ctime'], "%Y-%m-%d %H:%M:%S")
-        if 'title' not in params:
-            params['title'] = ""
+        if 'goods' not in params:
+            params['goods'] = ""
         item = Item.objects.create(**params)
         res['data'] = item.format()
 
@@ -57,9 +91,13 @@ def list(request):
     required = {
         'id': {'required': False},
         'openid': {'required': False},
+        'status': {'required': False},
         'type': {'required': False},
-        'title': {'required': False},
-        'desc': {'required': False},
+        'address': {'required': False},
+        'area': {'required': False},
+        'goods': {'required': False},
+        'descr': {'required': False},
+        'time': {'required': False},
         'page': {'required': False},
         'size': {'required': False},
         'visible': {'required': False}
@@ -98,11 +136,16 @@ def update(request):
     params = request.POST.dict()
     required = {
         'id': {'required': True},
-        'openid': {'required': False},
+        'openid': {'required': True},
+        'status': {'required': False},
         'type': {'required': False},
-        'title': {'required': False},
-        'desc': {'required': False},
-        'images': {'required': False},
+        'address': {'required': False},
+        'area': {'required': False},
+        'goods': {'required': False},
+        'descr': {'required': False},
+        'time': {'required': False},
+        'img': {'required': False},
+        'visible': {'required', False}
     }
     check_res = check(required, params)
     if check_res is None or check_res['code'] != 0:

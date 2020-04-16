@@ -20,7 +20,7 @@ from lib.view import check
 def itemImg(request):
     res = {'code': 0, 'msg': 'success', 'data': []}
     if request.method == 'POST':
-        files = request.FILES.getlist('images', None)  # input 标签中的name值
+        files = request.FILES.getlist('img', None)  # input 标签中的name值
         if not files:
             res = {'code': -1, 'msg': "无上传图片", 'data': []}
         else:

@@ -93,23 +93,27 @@ class ItemAdmin(admin.ModelAdmin):
         self.categories = None
 
     def type2str(self, obj):
-        return TYPE_DICT[obj.type]
+        return TYPE_DICT[obj.status]
 
-    def imagescnt(self, obj):
-        images = json.loads(obj.images)
-        return '{} 张, 点击id查看'.format(len(images))
+    def imgcnt(self, obj):
+        img = json.loads(obj.img)
+        return '{} 张, 点击id查看'.format(len(img))
 
-    imagescnt.short_description = '图片信息'
+    imgcnt.short_description = '图片信息'
 
     list_display = (
         'id',
         'openid',
         'type2str',
-        'title',
-        'desc',
-        'imagescnt',
-        'ctime',
+        'goods',
+        'area',
+        'address',
+        'type',
+        'time',
+        'descr',
+        'imgcnt',
+        'created_at',
         'visible'
     )
-    list_display_links = ('id', 'imagescnt')
-    search_fields = ('id', 'openid', 'type', 'title', 'desc', 'desc', 'visible')
+    list_display_links = ('id', 'imgcnt')
+    search_fields = ('id', 'openid', 'type', 'status', 'goods', 'area', 'address', 'time', 'descr', 'visible')

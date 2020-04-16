@@ -3,7 +3,6 @@
 * [x] <a href='#login'>login</a>   
 * [x] <a href='#getOpenid'>getOpenid</a>   
 * [x] <a href='#loginByOpenid'>loginByOpenid</a>   
-* [x] <a href='#logout'>logout</a>   
 * [x] <a href='#get'>get</a>   
 * [x] <a href='#update'>update</a>    
 
@@ -13,16 +12,16 @@
 
 ### 数据模型
 
-| 变量名    | 类型   | 变量含义                             |
-| --------- | ------ | :----------------------------------- |
-| id        | int    | 数据模型内部自增索引。前端无需操作。 |
-| openid    | string | 前端获取的用户唯一标识               |
-| name | string | 用户姓名                             |
-| phone     | string | 用户手机号   |
-| card | string | 用户的校园卡号 |
-| contact | string | 用户的其他联系方式，如QQ/微信等（可不填） |
-| ctime     | string | 数据创建时间（所有model共有的特性）  |
-| mtime     | string | 数据修改时间（所有model共有的特性）  |
+| 变量名      | 类型   | 变量含义                             |
+| ----------- | ------ | :----------------------------------- |
+| id          | int    | 数据模型内部自增索引。前端无需操作。 |
+| openid      | string | 前端获取的用户唯一标识               |
+| name        | string | 用户姓名                             |
+| phone       | string | 用户手机号                           |
+| cardno      | string | 用户的学号                           |
+| wxid        | string | 用户微信号                           |
+| created_at  | string | 数据创建时间（所有model共有的特性）  |
+| modified_at | string | 数据修改时间（所有model共有的特性）  |
 
 ### Token鉴权
 
@@ -30,7 +29,7 @@
 
 请前端同学先调用token账户鉴权系统，鉴权成功后再以流程验证登录。
 
-**鉴权成功后，鉴权返回的手机号、姓名、校园卡号可以直接作为login的参数进行注册。**
+**鉴权成功后，鉴权返回的手机号、姓名、学号可以直接作为login的参数进行注册。**
 
 
 ```mermaid
@@ -55,13 +54,13 @@ url = www.example.com/service/user/login
 method = post   
 params:   
 
-| 名称      |  类型  | 必须 |                       备注                        |
-| --------- | :----: | :--: | :-----------------------------------------------: |
-| openid    | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
-| phone     | string |  是  |            手机号             |
-| name | string |  是  |            用户姓名             |
-| card | string | 是 | 用户的校园卡号 |
-| contact | string | 否 | （可选）用户的其他联系方式，如QQ/微信等 |
+| 名称   |  类型  | 必须 |                       备注                        |
+| ------ | :----: | :--: | :-----------------------------------------------: |
+| openid | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
+| phone  | string |  是  |                      手机号                       |
+| name   | string |  是  |                     用户姓名                      |
+| cardno | string |  是  |                    用户的学号                     |
+| wxid   | string |  否  |      （可选）用户的其他联系方式，如QQ/微信等      |
 
 return:
 
@@ -74,10 +73,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35",
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -125,10 +124,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35",
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -162,10 +161,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35",
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -187,12 +186,11 @@ url = www.example.com/service/user/update
 method = post   
 params:   
 
-| 名称    |     类型     | 必须 |                            备注                             |
-| :------ | :----------: | :--: | :---------------------------------------------------------: |
-| user_id |     int      |  是  |                                                             |
-| update  | json(string) |  是  | 如果提交的是字符串格式的json程序会loads，但最好提交json格式 |
+| 名称    |     类型     | 必须 | 备注 |
+| :------ | :----------: | :--: | :--: |
+| user_id |     int      |  是  |      |
+| update  | json(string) |  是  |      |
 
-e.g.:   
 update={"phone":"13333333333"}   
 
 return:   
@@ -213,6 +211,8 @@ return:
 | -2   |      其他错误，详情见错误输出      |
 | -3   | update参数提交的不是有效的json格式 |
 | -4   |            json处理错误            |
+
+
 
 
 

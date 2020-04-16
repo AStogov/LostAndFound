@@ -212,10 +212,10 @@ python manage.py createsuperuser
 | openid  | string | 前端获取的用户唯一标识                    |
 | name    | string | 用户姓名                                  |
 | phone   | string | 用户手机号                                |
-| card    | string | 用户的校园卡号                            |
-| contact | string | 用户的其他联系方式，如QQ/微信等（可不填） |
-| ctime   | string | 数据创建时间（所有model共有的特性）       |
-| mtime   | string | 数据修改时间（所有model共有的特性）       |
+| cardno    | string | 用户的学号                            |
+| wxid | string | 用户微信号                           |
+| created_at   | string | 数据创建时间（所有model共有的特性）       |
+| modified_at   | string | 数据修改时间（所有model共有的特性）       |
 
 ### Token鉴权
 
@@ -223,7 +223,7 @@ python manage.py createsuperuser
 
 请前端同学先调用token账户鉴权系统，鉴权成功后再以流程验证登录。
 
-**鉴权成功后，鉴权返回的手机号、姓名、校园卡号可以直接作为login的参数进行注册。**
+**鉴权成功后，鉴权返回的手机号、姓名、学号可以直接作为login的参数进行注册。**
 
 
 ```mermaid
@@ -253,8 +253,8 @@ params:
 | openid  | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
 | phone   | string |  是  |                      手机号                       |
 | name    | string |  是  |                     用户姓名                      |
-| card    | string |  是  |                  用户的校园卡号                   |
-| contact | string |  否  |      （可选）用户的其他联系方式，如QQ/微信等      |
+| cardno    | string |  是  |                  用户的学号                   |
+| wxid | string |  否  |      （可选）用户的其他联系方式，如QQ/微信等      |
 
 return:
 
@@ -267,10 +267,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35"
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -318,10 +318,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35"
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -355,10 +355,10 @@ return:
         "openid": "xxxxxxxx",
         "phone": "12345678912",
         "name": "张三",
-        "card": "222222",
-        "contact": "weixin_id123",
-        "ctime": "2020-03-26 11:34:29",
-        "mtime": "2020-03-26 11:34:35"
+        "cardno": "0111111111111",
+        "wxid": "weixin_id123",
+        "created_at": "2020-03-26 11:34:29",
+        "modified_at": "2020-03-26 11:34:35"
     }
 }
 ```
@@ -433,16 +433,20 @@ return:
 ### 数据模型
 
 | 变量名    | 类型        | 变量含义                                 |
-| --------- | ----------- | :--------------------------------------- |
+| --------- | ----------- | :--------------------------------------: |
 | id        | int         | 模型内自动生成的自增索引，物品的唯一标识 |
 | openid    | string      | 发布者的openid                           |
-| type      | int         | 物品属性（1是丢失的，2是找到的）         |
-| title     | string      | 用户头像(url)，一般是微信头像            |
-| desc      | string      | 物品描述                                 |
-| images    | json_string | 物品图片                                 |
-| visible   | int         | 是否可见。（用来完成删除和重新发布操作） |
-| ctime     | string      | 数据创建时间（所有model共有的特性）      |
-| mtime     | string      | 数据修改时间（所有model共有的特性）      |
+| status | int | 1寻找失主；2寻找此物品 |
+| type      | string      | 物品属性（1是丢失的，2是找到的）         |
+| area        | int         | 校区（自行定义校区对应序号，例如： 0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升） |
+| address | string | 具体地点 |
+| time | string | 丢失或捡到的时间 |
+| goods     | string      | 物品名称        |
+| descr     | string      | 物品描述                                 |
+| img    | json_string | 物品图片                                 |
+| visible   | int         | 是否可见。（用来完成删除和重新发布操作）1可见0不可见 |
+| created_at     | string      | 数据创建时间（所有model共有的特性）      |
+| modified_at     | string      | 数据修改时间（所有model共有的特性）      |
 | user_info | json        | 发布者的个人用户信息                     |
 
 ### <a name='create'>create</a> 创建动态   
@@ -451,14 +455,18 @@ url = www.example.com/service/item/create
 method = post   
 params:   
 
-
-| 名称   |        类型 | 必须 |                             备注                             |
-| :----- | ----------: | :--: | :----------------------------------------------------------: |
-| openid |         int |  是  |                  用户标识，用来指明是谁发的                  |
-| type   |         int |  是  |                1:丢失了(lost) 2:找到了(found)                |
-| desc   |      string |  是  |                           物品描述                           |
-| title  |      string |  否  |                物品名称（保留字段，可只传""）                |
-| images | json_string |  否  | 建议先调用接口上传图片(upload/itemImg)，成功填此接口；或者先创建，再上传图片，再更新此字段（不建议） |
+| 变量名  | 类型        | 必须 | 变量含义                                                     |
+| ------- | :---------- | :--: | :----------------------------------------------------------- |
+| openid  | string      |  是  | 发布者的openid                                               |
+| status  | int         |  是  | 1寻找失主；2寻找此物品                                       |
+| type    | string      |  否  | 物品属性（1是丢失的，2是找到的）                             |
+| area    | int         |  否  | 校区（自行定义校区对应序号，例如： 0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升），默认为0 |
+| address | string      |  否  | 具体地点，可以为空                                           |
+| time    | string      |  否  | 丢失或捡到的时间，可以为空                                   |
+| goods   | string      |  否  | 物品名称                                                     |
+| descr   | string      |  否  | 物品描述，可以为空                                           |
+| img     | json_string |  否  | 物品图片，可以为空                                           |
+| visible | int         |  否  | 是否可见。（用来完成删除和重新发布操作）（默认为1，即为可见） |
 
 **返回该物品的信息。物品信息格式化输出时中包含了发布者的信息**
 
@@ -470,22 +478,27 @@ return:
     "msg": "success",
     "data": [{
                 "id": 1,
-                "openid": "1321321231",
-                "ctime": "2020-03-26 14:55:20",
-                "mtime": "2020-03-26 14:55:28",
-                "type": 1,
-                "title": "",
-                "desc": "丢失",
-                "images": [],
+                "openid": "xxxxxxxx",
+        		"goods": "XXX的校园卡",
+        		"type": "校园卡",
+        		"status": 1,
+        		"area": 1,
+                "img": [],
+        		"time": "2020-03-25 14:55:20",
+        		"address": "东院教四601",
+                "descr": "在教室里丢失了一张校园卡",
+                "created_at": "2020-03-26 14:55:20",
+                "modified_at": "2020-03-26 14:55:28",
+        		"visible": 1,
                 "user_info": {
                     "id": 1,
         			"openid": "xxxxxxxx",
         			"phone": "12345678912",
         			"name": "张三",
-        			"card": "222222",
-        			"contact": "weixin_id123",
-        			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35"
+        			"cardno": "012121212121",
+        			"wxid": "weixin_id123",
+        			"created_at": "2020-03-26 11:34:29",
+        			"modified_at": "2020-03-26 11:34:35"
                 }
             }]
 }
@@ -501,17 +514,18 @@ params:
 
 添加page和size的原因是控制一次呈现的物品数量，一面一次性返回过多数据。前端可以用“下一页”之类功能来使size+1来达到翻页效果
 
-
-| 名称    |   类型 | 必须 |                             备注                             |
-| :------ | -----: | :--: | :----------------------------------------------------------: |
-| id      |    int |  否  |                        以物品id来查询                        |
-| openid  |    int |  否  |         以openid来查询（用来查看用户发布的所有消息）         |
-| type    |    int |  否  |                 以类型来查询，1丢失的2找到的                 |
-| desc    | string |  否  |                           物品描述                           |
-| page    |    int |  否  | 显示第几页，如果无参数则默认显示第0页（防止一下载入太多数据） |
-| size    |    int |  否  |              每页几个物品，如果无参数则默认10个              |
-| title   | string |  否  |                物品名称（保留字段，可只传""）                |
-| visible |    int |  否  | 显示可见的或已隐藏的动态。默认值为1，即只显示可见的（未被delete操作的）动态。传0时可用来显示用户删除的动态。 |
+| 变量名  | 类型        | 必须 | 变量含义                                                     |
+| ------- | :---------- | :--: | :----------------------------------------------------------- |
+| openid  | string      |  否  | 以发布者查询                                                 |
+| status  | int         |  否  | 1寻找失主；2寻找此物品                                       |
+| type    | string      |  否  | 物品属性（1是丢失的，2是找到的）                             |
+| area    | int         |  否  | 校区（自行定义校区对应序号，例如： 0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升） |
+| address | string      |  否  | 具体地点                                                     |
+| time    | string      |  否  | 丢失或捡到的时间                                             |
+| goods   | string      |  否  | 物品名称                                                     |
+| descr   | string      |  否  | 物品描述                                                     |
+| img     | json_string |  否  | 物品图片                                                     |
+| visible | int         |  否  | 显示可见的或已隐藏的动态。默认值为1，即只显示可见的（未被delete操作的）动态。传0时可用来显示用户删除的动态。 |
 
 **列表返回的物品都是以id降序排序的，也就是指按发布时间降序排序，越新越靠前**
 
@@ -526,42 +540,52 @@ return:
         "items": [
             {
                 "id": 1,
-                "openid": "1321321231",
-                "ctime": "2020-03-26 14:55:20",
-                "mtime": "2020-03-26 14:55:28",
-                "type": 1,
-                "title": "",
-                "desc": "丢失",
-                "images": [],
+                "openid": "xxxxxxxx",
+        		"goods": "XXX的校园卡",
+        		"type": "校园卡",
+        		"status": 1,
+        		"area": 1,
+                "img": [],
+        		"time": "2020-03-25 14:55:20",
+        		"address": "东院教四601",
+                "descr": "在教室里丢失了一张校园卡",
+                "created_at": "2020-03-26 14:55:20",
+                "modified_at": "2020-03-26 14:55:28",
+        		"visible": 1,
                 "user_info": {
                     "id": 1,
         			"openid": "xxxxxxxx",
         			"phone": "12345678912",
-            		"name": "张三",
-        			"card": "222222",
-        			"contact": "weixin_id123",
-        			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35"
+        			"name": "张三",
+        			"cardno": "012121212121",
+        			"wxid": "weixin_id123",
+        			"created_at": "2020-03-26 11:34:29",
+        			"modified_at": "2020-03-26 11:34:35"
                 }
             },
             {
                 "id": 2,
-                "openid": "1321321231",
-                "ctime": "2020-03-26 16:53:28",
-                "mtime": "2020-03-26 16:53:28",
-                "type": 1,
-                "title": "",
-                "desc": "丢失",
-                "images": [],
+                "openid": "xxxxxxxx",
+        		"goods": "XXX的校园卡",
+        		"type": "校园卡",
+        		"status": 2,
+        		"area": 3,
+                "img": [],
+        		"time": "2020-03-25 14:55:20",
+        		"address": "南湖新食堂",
+                "descr": "在越苑食堂里捡到了一张校园卡",
+                "created_at": "2020-03-26 14:55:20",
+                "modified_at": "2020-03-26 14:55:28",
+        		"visible": 1,
                 "user_info": {
                     "id": 1,
         			"openid": "xxxxxxxx",
         			"phone": "12345678912",
-            		"name": "张三",
-        			"card": "222222",
-        			"contact": "weixin_id123",
-        			"ctime": "2020-03-26 11:34:29",
-        			"mtime": "2020-03-26 11:34:35"
+        			"name": "张三",
+        			"cardno": "012121212121",
+        			"wxid": "weixin_id123",
+        			"created_at": "2020-03-26 11:34:29",
+        			"modified_at": "2020-03-26 11:34:35"
                 }
             }
         ]
@@ -599,15 +623,19 @@ url = www.example.com/service/item/update
 method = post   
 params:   
 
-
-| 名称   |        类型 | 必须 |                             备注                             |
-| :----- | ----------: | :--: | :----------------------------------------------------------: |
-| id     |         int |  是  |                           物品的id                           |
-| openid |         int |  是  |                                                              |
-| type   |         int |  否  |                                                              |
-| images | json_string |  否  | 建议先调用接口上传图片(upload/itemImg)，成功填此接口；或者先创建，再上传图片，再更新此字段（不建议） |
-| title  |      string |  否  |                物品名称（保留字段，可只传""）                |
-| desc   |      string |  否  |                           物品描述                           |
+| 变量名  | 类型        | 必须 | 变量含义                                                     |
+| ------- | :---------- | :--: | :----------------------------------------------------------- |
+| id      | int         |  是  | 物品id                                                       |
+| openid  | string      |  是  | 发布者的openid                                               |
+| status  | int         |  否  | 1寻找失主；2寻找此物品                                       |
+| type    | string      |  否  | 物品属性（1是丢失的，2是找到的）                             |
+| area    | int         |  否  | 校区（自行定义校区对应序号，例如： 0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升） |
+| address | string      |  否  | 具体地点                                                     |
+| time    | string      |  否  | 丢失或捡到的时间                                             |
+| goods   | string      |  否  | 物品名称                                                     |
+| descr   | string      |  否  | 物品描述                                                     |
+| img     | json_string |  否  | 物品图片                                                     |
+| visible | int         |  否  | 是否可见。（用来完成删除和重新发布操作）（默认为1，即为可见） |
 
 return:
 
@@ -644,7 +672,7 @@ return:
 ```
 
 
-### 
+
 
 ## <a name = "upload">upload相关接口</a>
 
@@ -661,7 +689,7 @@ params:
 
 | 名称   | 类型 | 必须 |                    备注                     |
 | :----- | :--: | :--: | :-----------------------------------------: |
-| images | file |  是  | 可传多个、要将input标签中的name设置为images |
+| img | file |  是  | 可传多个、要将input标签中的name设置为img |
 
 return:
 
