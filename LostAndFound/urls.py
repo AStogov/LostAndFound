@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.static import serve
@@ -22,9 +23,9 @@ from LostAndFound import settings, views
 from LostAndFound.settings import MEDIA_ROOT
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^$', views.hello),
-    url(r'^service/', include('service.urls')),
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
-    # url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
-]
+                  path('admin/', admin.site.urls),
+                  url(r'^$', views.hello),
+                  url(r'^service/', include('service.urls')),
+                  re_path(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+                  url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+              ]

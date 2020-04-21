@@ -130,8 +130,8 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-# STATIC_ROOT = "C:\\Users\\Seok\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\django\\contrib\\admin\\static\\"
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR + '/media'  # if DEBUG else '/data/app_data/LostAndFound/media').replace('\\', '/')
@@ -140,5 +140,5 @@ if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
 # 在domain中修改服务器地址
-DOMAIN = '127.0.0.1:8000' if DEBUG else ''
+DOMAIN = '127.0.0.1:80' if DEBUG else 'lost.itoken.team'
 URL_PREFIX = ('http://' if DEBUG else 'https://') + DOMAIN

@@ -17,7 +17,7 @@ class BaseModel(models.Model):
         for f in self._meta.fields:
             dic[f.name] = getattr(self, f.name)
         for key in dic:
-            if 'time' in key:
+            if '_at' in key:
                 dic[key] = dic[key].strftime("%Y-%m-%d %H:%M:%S")
         return dic
 

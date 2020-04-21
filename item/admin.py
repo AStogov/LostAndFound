@@ -113,7 +113,11 @@ class ItemAdmin(admin.ModelAdmin):
         'descr',
         'imgcnt',
         'created_at',
-        'visible'
+        'visible',
+        'name',
+        'phone',
+        'wxid'
     )
     list_display_links = ('id', 'imgcnt')
-    search_fields = ('id', 'openid', 'type', 'status', 'goods', 'area', 'address', 'time', 'descr', 'visible')
+    search_fields = ('id', 'openid', 'type', 'status', 'goods', 'area', 'address', 'time', 'descr', 'visible', 'name',
+                     'phone', 'wxid')

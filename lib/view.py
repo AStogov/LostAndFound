@@ -34,15 +34,15 @@ class BaseView(View):
         return JsonResponse(self.res)
 
 
-def check(check, params):
+def check(to_check, params):
     for name in params:
-        if name not in check:
+        if name not in to_check:
             return {'code': -1, 'msg': 'unexpected params!',
-                    'data': {'required': check, 'unexpected': {name: params[name]}}}
-    for name in check:
-        if check[name].get('required', False) and (name not in params):
+                    'data': {'required': to_check, 'unexpected': {name: params[name]}}}
+    for name in to_check:
+        if to_check[name].get('required', False) and (name not in params):
             return {'code': -1, 'msg': 'params required not satisfied!',
-                    'data': {'required': check, 'expected': {name: check[name]}}}
+                    'data': {'required': to_check, 'expected': {name: to_check[name]}}}
     return {'code': 0}
 
 

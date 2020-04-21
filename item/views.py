@@ -37,9 +37,7 @@ id: 物品id
 openid: 发布者的openid 用来获取发布者信息
 goods: 物品的名称
 type: 物品类型(char)
-area: 校区(int)
-自行定义校区对应序号，例如：
-0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升
+area: 校区(char)
 address: 具体地点
 descr: 描述
 created_at: 发布时间
@@ -47,7 +45,7 @@ modified_at: 修改时间
 status: 物品的属性：1.寻找失主 2.寻找此物品
 time: 丢失或捡到的时间
 img: 图片(list) 物品的图片信息
-
+"contact": {"name":"", "phone": "", "wxid": ""}
 
 """
 
@@ -66,7 +64,10 @@ def create(request):
         'descr': {'required': False},
         'time': {'required': False},
         'img': {'required': False},
-        'visible': {'required', False}
+        'visible': {'required': False},
+        'name': {'required': False},
+        'phone': {'required': False},
+        'wxid': {'required': False},
     }
     check_res = check(required, params)
     if check_res is None or check_res['code'] != 0:
@@ -100,7 +101,10 @@ def list(request):
         'time': {'required': False},
         'page': {'required': False},
         'size': {'required': False},
-        'visible': {'required': False}
+        'visible': {'required': False},
+        'name': {'required': False},
+        'phone': {'required': False},
+        'wxid': {'required': False},
     }
     check_res = check(required, params)
     page = int(params.get('page', 0))
@@ -145,7 +149,10 @@ def update(request):
         'descr': {'required': False},
         'time': {'required': False},
         'img': {'required': False},
-        'visible': {'required', False}
+        'visible': {'required': False},
+        'name': {'required': False},
+        'phone': {'required': False},
+        'wxid': {'required': False},
     }
     check_res = check(required, params)
     if check_res is None or check_res['code'] != 0:

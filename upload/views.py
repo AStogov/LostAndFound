@@ -43,5 +43,5 @@ def itemImg(request):
             except Exception as e:
                 res['code'] = -2
                 res['msg'] = e
-            res['data'] = json.dumps(res['data'])
+            # res['data'] = json.dumps(res['data'])
     return JsonResponse(res)

@@ -111,7 +111,7 @@ def update(request):
 def get(request):
     res = {'code': 0, 'msg': 'success', 'data': []}
     params = request.POST.dict()
-    required = {'openid'}
+    required = {'openid': {'required': True}}
     check_res = check(required, params)
     if check_res is None or check_res['code'] != 0:
         return JsonResponse(check_res)

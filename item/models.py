@@ -42,16 +42,19 @@ class Item(BaseModel):
     time: 丢失或捡到的时间
     img: 图片(list) 物品的图片信息
     """
-    openid = models.IntegerField(null=False, blank=False)
+    openid = models.CharField(max_length=255)
     status = models.IntegerField(default=1)  # 1:found 2:lost
     type = models.CharField(max_length=255, blank=True)
     goods = models.CharField(max_length=255, blank=True)
-    area = models.IntegerField(default=0)
+    area = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, blank=True)
     descr = models.TextField(default='', blank=True)  # description
     img = models.TextField(default=json.dumps([]))  # u can upload more than one pic
     time = models.CharField(max_length=255, blank=True)
     visible = models.IntegerField(default=1)  # 1:visible 2:invisible
+    name = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=255, blank=True)
+    wxid = models.CharField(max_length=255, blank=True)
 
     def format(self, if_time_format=True, time_format=''):
         dic = super().format(if_time_format, time_format)
