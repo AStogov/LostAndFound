@@ -133,6 +133,10 @@ USE_TZ = False
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'templates/static'),
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR + '/media'  # if DEBUG else '/data/app_data/LostAndFound/media').replace('\\', '/')
 

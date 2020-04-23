@@ -715,7 +715,7 @@ return:
 {
     "code": 0,
     "msg": "success",
-    "data": "[\"https://www.example.com/media/item/2020/3/27/011216_59730.jpg\", \"https://www.example.com/media/item/2020/3/27/011216_89864.jpg\"]"
+    "data": ["https://www.example.com/media/item/2020/3/27/011216_59730.jpg", "https://www.example.com/media/item/2020/3/27/011216_89864.jpg"]
 }
 ```
 
