@@ -12,8 +12,8 @@ from lib.models import BaseModel
 #     3: '申领成功'
 # }
 TYPE_DICT = {
-    2: '丢失',
-    1: '找到',
+    2: '寻找此物品',
+    1: '寻找失主',
 }
 
 
@@ -31,9 +31,7 @@ class Item(BaseModel):
     openid: 发布者的openid 用来获取发布者信息
     goods: 物品的名称
     type: 物品类型(char)
-    area: 校区(int)
-    自行定义校区对应序号，例如：
-    0.余区  1.东院  2.西院  3.南湖  4.鉴湖  5.升升
+    area: 校区(char)
     address: 具体地点
     descr: 描述
     created_at: 发布时间
@@ -49,16 +47,16 @@ class Item(BaseModel):
     area = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, blank=True)
     descr = models.TextField(default='', blank=True)  # description
-    img = models.TextField(default=json.dumps([]))  # u can upload more than one pic
+    img = models.TextField(default='', blank=True)  # u can upload more than one pic
     time = models.CharField(max_length=255, blank=True)
-    visible = models.IntegerField(default=1)  # 1:visible 2:invisible
+    visible = models.IntegerField(default=1)  # 1:visible 0:invisible
     name = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=255, blank=True)
     wxid = models.CharField(max_length=255, blank=True)
 
     def format(self, if_time_format=True, time_format=''):
         dic = super().format(if_time_format, time_format)
-        dic['img'] = json.loads(dic['img'])
+        # dic['img'] = json.loads(dic['img'])
         user_res = client.rpc('user/get', {'openid': dic['openid']})
         dic['user_info'] = user_res['data']
         return dic

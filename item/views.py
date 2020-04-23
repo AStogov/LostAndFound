@@ -42,7 +42,7 @@ address: 具体地点
 descr: 描述
 created_at: 发布时间
 modified_at: 修改时间
-status: 物品的属性：1.寻找失主 2.寻找此物品
+status: 物品的属性：1.寻找此物品的物品 2.寻找此物品
 time: 丢失或捡到的时间
 img: 图片(list) 物品的图片信息
 "contact": {"name":"", "phone": "", "wxid": ""}

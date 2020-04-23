@@ -12,14 +12,5 @@ sed -i "s/NAME_PROD/${DB_NAME}/g"      LostAndFound/settings.py
 sed -i "s/PORT_PROD/${PORT}/g"         LostAndFound/settings.py
 
 
-# ------- should be removed --------
-#sed -i '/destructive_warning/s/True/False/g' ~/.myclirc
-#echo 'DROP TABLE item_item' | python manage.py dbshell 
-#echo 'DROP TABLE user_user' | python manage.py dbshell 
-python manage.py makemigrations item
-python manage.py makemigrations user
-python manage.py migrate
-# ------------------
-
 exec "$@"
 
