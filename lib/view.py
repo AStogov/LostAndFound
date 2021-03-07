@@ -46,6 +46,14 @@ def check(to_check, params):
     return {'code': 0}
 
 
+def judge(a: list, b: list):
+    if not b:
+        return True
+    set1 = set(a)
+    set2 = set(b)
+    return set1 & set2 != set()
+
+
 def formatQuerySet(qset):
     res = []
     for obj in qset:

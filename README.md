@@ -199,6 +199,9 @@ python manage.py createsuperuser
 * [x] <a href='#loginByOpenid'>loginByOpenid</a>   
 * [x] <a href='#get'>get</a>   
 * [x] <a href='#update'>update</a>    
+* [x] <a href='#addHistory'>addHistory</a>    
+* [x] <a href='#getHistory'>getHistory</a>    
+* [x] <a href='#cleanHistory'>cleanHistory</a>   
 
 用户交互流程  
 
@@ -252,8 +255,8 @@ params:
 | ------- | :----: | :--: | :-----------------------------------------------: |
 | openid  | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
 | phone   | string |  是  |                      手机号                       |
-| name    | string |  是  |                     用户姓名                      |
-| cardno    | string |  是  |                  用户的学号                   |
+| name    | string |  否  |                     用户姓名                      |
+| cardno    | string |  否  |                  用户的学号                   |
 | wxid | string |  否  |      （可选）用户的其他联系方式，如QQ/微信等      |
 
 return:
@@ -407,6 +410,140 @@ return:
 | -3   | update参数提交的不是有效的json格式 |
 | -4   |            json处理错误            |
 
+### <a name='addHistory'>addHistory</a> 添加历史搜索记录
+
+**历史记录以json字符串保存在数据库中**
+
+url = www.example.com/service/user/addHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 |        备注        |
+| :----- | :----: | :--: | :----------------: |
+| openid | string |  是  |                    |
+| hist   | string |  是  | 添加的单条历史记录 |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": ['123']				//返回json格式的历史记录
+}
+```
+
+
+
+### <a name='getHistory'>getHistory</a> 获取历史搜索记录
+
+url = www.example.com/service/user/getHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 | 备注 |
+| :----- | :----: | :--: | :--: |
+| openid | string |  是  |      |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": ['123']				//返回json格式的历史记录
+}
+```
+
+
+
+### <a name='cleanHistory'>cleanHistory</a> 清除历史搜索记录
+
+url = www.example.com/service/user/cleanHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 | 备注 |
+| :----- | :----: | :--: | :--: |
+| openid | string |  是  |      |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": []				//成功清除会返回空值
+}
+```
+
+
+
+### <a name='favor'>favor</a> 收藏
+
+/service/user/favor
+
+只需要两个参数：openid和id（物品的id）
+
+收藏的物品会保存在user的favored数组中
+
+如果用户已经收藏过，就会返回
+
+```python
+{'code': -6, 'msg': 'ThisItemHasAlreadyBeenFavored', 'data': []}
+```
+
+最大收藏数是50（因为数据库限制最大字符数是160，所以稳妥起见最多保存50个id），如果超过了最大收藏数会返回
+
+```python
+{'code': -5, 'msg': 'MaxFavoredItems', 'data': []}
+```
+
+如果没有以上错误，参数都正确会返回
+
+```python
+{"code": 0, "msg": "success", "data": ["123"]}
+```
+
+data中是一个数组，里面保存着收藏的item的id
+
+### <a name='disfavor'>disfavor</a> 取消收藏
+
+/service/user/disfavor
+
+也只需要两个参数：openid和id（物品的id）
+
+在user的favored数组中移除这个id
+
+如果用户没有收藏过这个物品，就会返回
+
+```python
+{'code': -6, 'msg': 'ThisItemHasNotEverBeenFavored', 'data': []}
+```
+
+如果没有以上错误，参数都正确会返回
+
+```python
+{"code": 0, "msg": "success", "data": []}
+```
+
+data中是一个数组，里面保存着收藏的item的id
+
+### <a name='listFavored'>listFavored</a> 列出收藏的内容
+
+/service/user/listFavored
+
+只需要一个参数：openid
+
+和getHistory方法用法相似，以数组形式返回用户的收藏的所有物品的id。
+
+```
+{"code": 0, "msg": "success", "data": ["123"]}
+```
+
 
 
   ## <a name = "item">item相关接口</a>
@@ -440,7 +577,7 @@ return:
 | goods       | string      |                           物品名称                           |
 | descr       | string      |                           物品描述                           |
 | img         | json_string |                           物品图片                           |
-| visible     | int         |     是否可见。（用来完成删除和重新发布操作）1可见0不可见     |
+| visible     | int         |         1：未找到。0：已找到。更新状态通过update操作         |
 | created_at  | string      |             数据创建时间（所有model共有的特性）              |
 | modified_at | string      |             数据修改时间（所有model共有的特性）              |
 | user_info   | json        |                     发布者的个人用户信息                     |
@@ -465,7 +602,7 @@ params:
 | goods   | string      |  否  | 物品名称                                                     |
 | descr   | string      |  否  | 物品描述，可以为空                                           |
 | img     | json_string |  否  | 物品图片，可以为空                                           |
-| visible | int         |  否  | 是否可见。（用来完成删除和重新发布操作）（默认为1，即为可见） |
+| visible | int         |  否  | 1：未找到。0：已找到。                                       |
 | name    | string      |  否  | 发布者留下的姓名                                             |
 | phone   | string      |  否  | 发布者留下的电话                                             |
 | wxid    | string      |  否  | 发布者留下的微信号                                           |
@@ -532,7 +669,7 @@ params:
 | page    | int         |  否  | 呈现第几页（默认是0，为了控制一次返回的物品数量以免爆页）    |
 | size    | int         |  否  | 每页物品数量（默认是10，为了控制一次返回的物品数量以免爆页） |
 | img     | json_string |  否  | 物品图片                                                     |
-| visible | int         |  否  | 显示可见的或已隐藏的动态。默认值为1，即只显示可见的（未被delete操作的）动态。传0时可用来显示用户删除的动态。 |
+| visible | int         |  否  | 1：未找到。0：已找到。                                       |
 | name    | string      |  否  |                                                              |
 | phone   | string      |  否  |                                                              |
 | wxid    | string      |  否  |                                                              |
@@ -663,7 +800,9 @@ return:
 }
 ```
 
-### <a name='recover'>recover</a> 恢复动态   
+### <a name='recover'>recover</a> 恢复动态
+
+<u>***根据要求，此功能暂时不使用。***</u>
 
 **用于重新发布**
 

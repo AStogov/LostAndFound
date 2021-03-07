@@ -107,7 +107,7 @@ class ItemAdmin(admin.ModelAdmin):
         'descr',
         'created_at',
         'visible',
-        'name',
+        'qq',
         'phone',
         'wxid'
     )

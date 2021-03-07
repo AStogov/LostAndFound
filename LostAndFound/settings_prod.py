@@ -25,7 +25,7 @@ SECRET_KEY = 'd$)2f3-b@l!#&^^=ocaw1@m(ch=mx0ej!8lm7pi!vb#kx!3i*w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*',]
+ALLOWED_HOSTS = ['*', ]
 
 # Application definition
 
@@ -87,12 +87,12 @@ DATABASES = {
     }
 }
 
-#DATABASES = {
+# DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.sqlite3',
 #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #    }
-#}
+# }
 
 
 # Password validation
@@ -133,6 +133,10 @@ USE_TZ = False
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'templates/static'),
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR + '/media'  # if DEBUG else '/data/app_data/LostAndFound/media').replace('\\', '/')
 
@@ -142,4 +146,3 @@ if not os.path.exists(MEDIA_ROOT):
 # 在domain中修改服务器地址
 DOMAIN = '0.0.0.0:8000' if DEBUG else 'lost.itoken.team'
 URL_PREFIX = ('http://' if DEBUG else 'https://') + DOMAIN
-

@@ -42,15 +42,15 @@ class Item(BaseModel):
     """
     openid = models.CharField(max_length=255)
     status = models.IntegerField(default=1)  # 1:found 2:lost
-    type = models.CharField(max_length=255, blank=True)
+    type = models.CharField(max_length=255, blank=True, default=json.dumps([]), null=False)     # 复选搜索。所以传递json数组
     goods = models.CharField(max_length=255, blank=True)
-    area = models.CharField(max_length=255, blank=True)
+    area = models.CharField(max_length=255, blank=True, default=json.dumps([]), null=False)     # 复选搜索。所以传递json数组
     address = models.CharField(max_length=255, blank=True)
     descr = models.TextField(default='', blank=True)  # description
-    img = models.TextField(default='', blank=True)  # u can upload more than one pic
+    img = models.TextField(default=json.dumps([]), blank=True, null=False)  # u can upload more than one pic
     time = models.CharField(max_length=255, blank=True)
-    visible = models.IntegerField(default=1)  # 1:visible 0:invisible
-    name = models.CharField(max_length=255, blank=True)
+    visible = models.IntegerField(default=1)  # 1:Not Yet Found 0:Already Found
+    qq = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=255, blank=True)
     wxid = models.CharField(max_length=255, blank=True)
 

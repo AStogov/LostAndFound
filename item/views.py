@@ -17,27 +17,16 @@ from item.models import Item
 from lib import client, sms, utils
 from lib.client import rpc
 from lib.utils import log
-from lib.view import check
+from lib.view import check, judge
 
 """
-
-openid = models.IntegerField(null=False, blank=False)
-status = models.IntegerField(default=1)  # 1:found 2:lost
-type = models.CharField(max_length=255, blank=True)
-goods = models.CharField(max_length=255, blank=True)
-area = models.IntegerField(default=0)
-address = models.CharField(max_length=255, blank=True)
-descr = models.TextField(default='', blank=True)  # description
-img = models.TextField(default=json.dumps([]))  # u can upload more than one pic
-time = models.CharField(max_length=255, blank=True)
-visible = models.IntegerField(default=1)  # 1:visible 0:invisible
 
 
 id: 物品id
 openid: 发布者的openid 用来获取发布者信息
 goods: 物品的名称
-type: 物品类型(char)
-area: 校区(char)
+type: 物品类型(char) json形式的数组
+area: 校区(char) json形式的数组
 address: 具体地点
 descr: 描述
 created_at: 发布时间
@@ -45,7 +34,7 @@ modified_at: 修改时间
 status: 物品的属性：1.寻找此物品的物品 2.寻找此物品
 time: 丢失或捡到的时间
 img: 图片(list) 物品的图片信息
-"contact": {"name":"", "phone": "", "wxid": ""}
+"contact": {"qq":"", "phone": "", "wxid": ""}
 
 """
 
@@ -65,7 +54,7 @@ def create(request):
         'time': {'required': False},
         'img': {'required': False},
         'visible': {'required': False},
-        'name': {'required': False},
+        'qq': {'required': False},
         'phone': {'required': False},
         'wxid': {'required': False},
     }
@@ -86,6 +75,7 @@ def create(request):
 
 
 @csrf_exempt
+# 产品部竟然要让area和type变成复选搜索
 def list(request):
     res = {'code': 0, 'msg': 'success', 'data': {}}
     params = request.POST.dict()
@@ -99,35 +89,42 @@ def list(request):
         'goods': {'required': False},
         'descr': {'required': False},
         'time': {'required': False},
-        'page': {'required': False},
-        'size': {'required': False},
         'visible': {'required': False},
-        'name': {'required': False},
+        'qq': {'required': False},
         'phone': {'required': False},
         'wxid': {'required': False},
     }
     check_res = check(required, params)
-    page = int(params.get('page', 0))
-    size = int(params.get('size', 10))
-    if 'size' in params:
-        params.pop('size')
-    if 'page' in params:
-        params.pop('page')
-    if 'visible' not in params:
-        params['visible'] = 1
+    types = []
+    areas = []
 
+    if 'type' in params:
+        types = json.loads(params.pop('type'))
+    if 'area' in params:
+        areas = json.loads(params.pop('area'))
     if check_res is None or check_res['code'] != 0:
         return JsonResponse(check_res)
 
     try:
-        cnt = Item.objects.filter(**params).count()
-        # 以创建时间排序
-        data = Item.objects.filter(**params).order_by('-id')[page * size:(page + 1) * size]
-        res['data']['cnt'] = cnt
+        # 先用搜索框内的关键词进行第一次筛选
+        if 'address' in params:
+            data = Item.objects.filter(address__icontains=params['address']).order_by('-id')
+        elif 'goods' in params:
+            data = Item.objects.filter(goods__icontains=params['goods']).order_by('-id')
+        elif 'descr' in params:
+            data = Item.objects.filter(descr__icontains=params['descr']).order_by('-id')
+        else:
+            # 以创建时间排序
+            data = Item.objects.filter(**params).order_by('-id')
+        # 以type和area开始第二次筛选
+        cnt = 0
         res['data']['items'] = []
-        for obj in data:
-            obj = obj.format()
-            res['data']['items'].append(obj)
+        for i in data:
+            if judge(json.loads(i.type), types) and judge(json.loads(i.area), areas):
+                i = i.format()
+                res['data']['items'].append(i)
+                cnt += 1
+        res['data']['cnt'] = cnt
     except Exception as e:
         res = {'code': -2, 'msg': e.__str__(), 'data': []}
         utils.log('ERROR', 'item list', res['msg'], data=params)
@@ -150,7 +147,7 @@ def update(request):
         'time': {'required': False},
         'img': {'required': False},
         'visible': {'required': False},
-        'name': {'required': False},
+        'qq': {'required': False},
         'phone': {'required': False},
         'wxid': {'required': False},
     }
@@ -182,7 +179,7 @@ def delete(request):
     if check_res is None or check_res['code'] != 0:
         return JsonResponse(check_res)
     try:
-        Item.objects.filter(id=params['id'], openid=params['openid']).update(visible=0)
+        Item.objects.filter(id=params['id'], openid=params['openid']).delete()
     except Exception as e:
         res = {'code': -2, 'msg': e.__str__(), 'data': []}
         utils.log('ERROR', 'item deleted', res['msg'], data=params)

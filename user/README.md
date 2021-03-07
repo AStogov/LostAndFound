@@ -5,6 +5,9 @@
 * [x] <a href='#loginByOpenid'>loginByOpenid</a>   
 * [x] <a href='#get'>get</a>   
 * [x] <a href='#update'>update</a>    
+* [x] <a href='#addHistory'>addHistory</a>    
+* [x] <a href='#getHistory'>getHistory</a>    
+* [x] <a href='#cleanHistory'>cleanHistory</a>    
 
 用户交互流程  
 
@@ -16,7 +19,7 @@
 | ----------- | ------ | :----------------------------------- |
 | id          | int    | 数据模型内部自增索引。前端无需操作。 |
 | openid      | string | 前端获取的用户唯一标识               |
-| name        | string | 用户姓名                             |
+| qq        | string | qq                             |
 | phone       | string | 用户手机号                           |
 | cardno      | string | 用户的学号                           |
 | wxid        | string | 用户微信号                           |
@@ -58,7 +61,7 @@ params:
 | ------ | :----: | :--: | :-----------------------------------------------: |
 | openid | string |  是  | 可通过云函数或getOpenid获取，是每个用户的唯一凭证 |
 | phone  | string |  是  |                      手机号                       |
-| name   | string |  是  |                     用户姓名                      |
+| qq   | string |  是  |                     qq                      |
 | cardno | string |  是  |                    用户的学号                     |
 | wxid   | string |  否  |      （可选）用户的其他联系方式，如QQ/微信等      |
 
@@ -72,7 +75,7 @@ return:
         "id": 1,
         "openid": "xxxxxxxx",
         "phone": "12345678912",
-        "name": "张三",
+        "qq": "张三",
         "cardno": "0111111111111",
         "wxid": "weixin_id123",
         "created_at": "2020-03-26 11:34:29",
@@ -123,7 +126,7 @@ return:
         "id": 1,
         "openid": "xxxxxxxx",
         "phone": "12345678912",
-        "name": "张三",
+        "qq": "张三",
         "cardno": "0111111111111",
         "wxid": "weixin_id123",
         "created_at": "2020-03-26 11:34:29",
@@ -146,9 +149,9 @@ url = www.example.com/service/user/get
 method = post   
 params:   
 
-| 名称   | 类型 | 必须 | 备注 |
-| :----- | :--: | :--: | :--: |
-| openid | int  |  是  |      |
+| 名称   |  类型  | 必须 | 备注 |
+| :----- | :----: | :--: | :--: |
+| openid | string |  是  |      |
 
 return:
 
@@ -160,7 +163,7 @@ return:
         "id": 1,
         "openid": "xxxxxxxx",
         "phone": "12345678912",
-        "name": "张三",
+        "qq": "张三",
         "cardno": "0111111111111",
         "wxid": "weixin_id123",
         "created_at": "2020-03-26 11:34:29",
@@ -186,10 +189,10 @@ url = www.example.com/service/user/update
 method = post   
 params:   
 
-| 名称    |     类型     | 必须 | 备注 |
-| :------ | :----------: | :--: | :--: |
-| user_id |     int      |  是  |      |
-| update  | json(string) |  是  |      |
+| 名称   |     类型     | 必须 | 备注 |
+| :----- | :----------: | :--: | :--: |
+| openid |    string    |  是  |      |
+| update | json(string) |  是  |      |
 
 update={"phone":"13333333333"}   
 
@@ -215,4 +218,74 @@ return:
 
 
 
+
+### <a name='addHistory'>addHistory</a> 添加历史搜索记录
+
+**历史记录以json字符串保存在数据库中**
+
+url = www.example.com/service/user/addHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 |        备注        |
+| :----- | :----: | :--: | :----------------: |
+| openid | string |  是  |                    |
+| hist   | string |  是  | 添加的单条历史记录 |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": ['123']				//返回json格式的历史记录
+}
+```
+
+
+
+### <a name='getHistory'>getHistory</a> 获取历史搜索记录
+
+url = www.example.com/service/user/getHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 | 备注 |
+| :----- | :----: | :--: | :--: |
+| openid | string |  是  |      |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": ['123']				//返回json格式的历史记录
+}
+```
+
+
+
+### <a name='cleanHistory'>cleanHistory</a> 清除历史搜索记录
+
+url = www.example.com/service/user/cleanHistory
+
+method = post   
+params:   
+
+| 名称   |  类型  | 必须 | 备注 |
+| :----- | :----: | :--: | :--: |
+| openid | string |  是  |      |
+
+return:   
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": []				//成功清除会返回空值
+}
+```
 

@@ -55,9 +55,9 @@ def login(request):
     # 必须内容
     required = {
         'openid': {'required': True},
-        'phone': {'required': True},
-        'cardno': {'required': True},
-        'name': {'required': True},
+        'phone': {'required': False},
+        'cardno': {'required': False},
+        'qq': {'required': False},
         'wxid': {'required': False}
     }
     params = request.POST.dict()
@@ -65,13 +65,9 @@ def login(request):
     try:
         openid = request.POST['openid']
         dic = request.POST.dict().copy()
-        update_data = {
-            'name': dic['name'],
-            'phone': dic['phone'],
-            'cardno': dic['cardno']
-        }
-        if 'wxid' in dic:
-            update_data['wxid'] = dic['wxid']
+        update_data = {}
+        for (u, v) in dic.items():
+            update_data[u] = v
         # 如果不存在此用户，以openid创建这个用户
         user, created = User.objects.update_or_create(openid=openid, defaults=update_data)
         res['data'] = user.format()
@@ -101,7 +97,7 @@ def update(request):
                     {'code': -3, 'msg': 'field "update" should be a JSON object or JSON string', 'data': []})
         except Exception as e:
             return JsonResponse({'code': -4, 'msg': e.__str__(), 'data': 'json unsterilized error'})
-        User.objects.filter(id=openid).update(**update_data)
+        User.objects.filter(openid=openid).update(**update_data)
     except Exception as e:
         res = {'code': -2, 'msg': e.__str__(), 'data': []}
     return JsonResponse(res)
@@ -126,3 +122,169 @@ def get(request):
         res = {'code': -3, 'msg': e.__str__(), 'data': []}
     return JsonResponse(res)
 
+
+# 产品部说要有历史搜索，那就加个历史搜索
+@csrf_exempt
+def getHistory(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    # openid : OPENID
+    required = {'openid': {'required': True}}
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    try:
+        user = User.objects.get(openid=openid)
+        history = json.loads(user.history)
+        if len(history) > 6:  # MAX SAVE 6 HISTORY
+            history = history[:6]
+        res['data'] = history
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def addHistory(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    # openid : OPENID, hist : HISTORY TO ADD
+    required = {'openid': {'required': True}, 'hist': {'required': True}}
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    hist = params['hist']
+    try:
+        user = User.objects.get(openid=openid)
+        history = json.loads(user.history)
+        if len(history) >= 6:  # MAX SAVE 6 HISTORY
+            history = history[:5]
+        while hist in history:
+            history.remove(hist)
+        history.insert(0, hist)
+        User.objects.filter(openid=openid).update(history=json.dumps(history))
+        res['data'] = history
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def cleanHistory(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    # openid : OPENID
+    required = {'openid': {'required': True}}
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    try:
+        User.objects.filter(openid=openid).update(history=json.dumps([]))
+        user = User.objects.get(openid=openid)
+        res['data'] = user.history
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def favor(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    required = {
+        'openid': {'required': True},
+        'id': {'required': True}
+    }
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    item_id = params['id']
+    try:
+        user = User.objects.get(openid=openid)
+        favored = json.loads(user.favored)
+        if len(favored) >= 50:
+            res = {'code': -5, 'msg': 'MaxFavoredItems', 'data': []}
+        elif item_id in favored:
+            res = {'code': -6, 'msg': 'ThisItemHasAlreadyBeenFavored', 'data': []}
+        else:
+            favored.append(item_id)
+            User.objects.filter(openid=openid).update(favored=json.dumps(favored))
+            res['data'] = favored
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def disfavor(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    required = {
+        'openid': {'required': True},
+        'id': {'required': True}
+    }
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    item_id = params['id']
+    try:
+        user = User.objects.get(openid=openid)
+        favored = json.loads(user.favored)
+        if item_id not in favored:
+            res = {'code': -6, 'msg': 'ThisItemHasNotEverBeenFavored', 'data': []}
+        else:
+            favored.remove(item_id)
+            User.objects.filter(openid=openid).update(favored=json.dumps(favored))
+            res['data'] = favored
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
+
+
+@csrf_exempt
+def listFavored(request):
+    res = {'code': 0, 'msg': 'success', 'data': []}
+    params = request.POST.dict()
+    required = {
+        'openid': {'required': True}
+    }
+    check_res = check(required, params)
+    if check_res is None or check_res['code'] != 0:
+        return JsonResponse(check_res)
+    openid = params['openid']
+    try:
+        user = User.objects.get(openid=openid)
+        favored = json.loads(user.favored)
+        res['data'] = favored
+    except User.DoesNotExist:
+        res = {'code': -4, 'msg': 'ThisUserDoesNotExist', 'data': []}
+    except User.MultipleObjectsReturned:
+        res = {'code': -2, 'msg': 'MultipleObjectsReturned', 'data': []}
+    except Exception as e:
+        res = {'code': -3, 'msg': e.__str__(), 'data': []}
+    return JsonResponse(res)
