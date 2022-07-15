@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
@@ -24,8 +23,8 @@ from LostAndFound.settings import MEDIA_ROOT
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  url(r'^$', views.hello),
-                  url(r'^service/', include('service.urls')),
+                  re_path(r'^$', views.hello),
+                  re_path(r'^service/', include('service.urls')),
                   re_path(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
-                  url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+                  re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
               ]

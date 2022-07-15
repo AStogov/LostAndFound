@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from upload import views
 
 urlpatterns = [
-    url(r'^itemImg$', views.itemImg),
+    re_path(r'^itemImg$', views.itemImg),
 ]

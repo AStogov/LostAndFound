@@ -3,7 +3,7 @@ import json
 import operator
 from functools import reduce
 
-from django.contrib.admin.utils import lookup_needs_distinct
+from django.contrib.admin.utils import lookup_spawns_duplicates
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP

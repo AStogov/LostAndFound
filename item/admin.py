@@ -5,7 +5,7 @@ from functools import reduce
 from django.contrib import admin
 
 # Register your models here.
-from django.contrib.admin.utils import lookup_needs_distinct
+from django.contrib.admin.utils import lookup_spawns_duplicates
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
@@ -84,7 +84,7 @@ class ItemAdmin(admin.ModelAdmin):
                 or_queries = [models.Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator_fc, or_queries))
-            use_distinct |= any(lookup_needs_distinct(self.opts, search_spec) for search_spec in orm_lookups)
+            use_distinct |= any(lookup_spawns_duplicates(self.opts, search_spec) for search_spec in orm_lookups)
 
         return queryset, use_distinct
 

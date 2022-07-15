@@ -1,11 +1,10 @@
-from django.conf.urls import url
-from django.urls import include
+from django.urls import include, re_path
 
 from service import views
 
 urlpatterns = [
-    url(r'^$', views.hello),
-    url(r'^user/', include('user.urls')),
-    url(r'^item/', include('item.urls')),
-    url(r'^upload/', include('upload.urls'))
+    re_path(r'^$', views.hello),
+    re_path(r'^user/', include('user.urls')),
+    re_path(r'^item/', include('item.urls')),
+    re_path(r'^upload/', include('upload.urls'))
 ]
