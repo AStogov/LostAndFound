@@ -1,6 +1,6 @@
 Django==4.0.4
 asgiref==3.5.2
-certifi==2022.6.15
+certifi==2022.12.7
 chardet==5.0.0
 idna==3.3
 jmespath==1.0.1
